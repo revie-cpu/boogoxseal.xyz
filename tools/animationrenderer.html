@@ -1,435 +1,240 @@
 <!DOCTYPE html>
-<html lang="en" style="background-color:rgb(17, 5, 29) ;">
+<html lang="en" style="background-color:rgb(17, 5, 29);">
 <head>
-	<title>Animation Renderer - BOOGO x SEAL & LeBeaBae</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Boogo and Seal make Incredibox Mods and Tools.">
-	<link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="../icons/favicon-16x16.png">
-	<link rel="manifest" href="../icons/site.webmanifest">
-	<link rel="shortcut icon" href="../icons/favicon.ico">
-	<meta name="msapplication-TileColor" content="#603cba">
-	<meta name="msapplication-config" content="../icons/browserconfig.xml">
-	<meta name="theme-color" content="#ffffff">
-	<meta charset="UTF-8">
-	<meta property="og:type" content="website">
-	<meta property="og:site_name" content="BOOGO x SEAL">
-	<meta property="og:title" content="Animation Renderer" />
-    <meta property="og:image" content="https://boogoxseal.xyz/assets/banner.png" />
-    <meta property="twitter:image:src" content="https://boogoxseal.xyz/assets/banner.png" />
-	<meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:description" content="Boogo and Seal make Incredibox Mods and Tools.">
-    <meta name="og:image:alt" content="Boogo and Seal make Incredibox Mods and Tools.">
-    <meta name="og:description" content="Boogo and Seal make Incredibox Mods and Tools.">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/topnav.css">
-    <link rel="stylesheet" href="../css/required.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
-    <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
-    <script src="../js/GIFEncoder.js"></script>
-    <script src="../js/LZWEncoder.js"></script>
-    <script src="../js/NeuQuant.js"></script>
-    <link rel="stylesheet" href="../css/overlay.css">
-    <script src="../js/general-functions.js"></script>
+    <title>Animation Renderer - URL Input & Custom Loop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
     <style>
-        td{text-align:center}.th-custom{overflow:auto;font-weight:200;text-align:center;padding-left:5px;padding-right:5px;font-size:28px;margin:10px}body{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;color:#fff;overflow:auto;font-family:monospace;font-weight:500;margin-top:15vh}.coolButton{font-size:15px;margin-right:10px;transition:all .2s linear;border-style:solid;color:var(--color);border-width:2px;border-color:#7023b8;font-family:monospace}.coolButton:hover{transform:translateY(-3px);border-radius:28px;border-bottom-right-radius:28px;border-top-right-radius:28px;border-top-left-radius:28px;border-bottom-left-radius:28px;border-color:#7023b8;font-family:monospace}.parent:hover .coolButton:not(:hover){border-radius:29px;font-family:monospace}h1,h3{font-family:monospace}
+        body {
+            background-color: rgb(17, 5, 29);
+            color: white;
+            font-family: monospace;
+            user-select: none;
+            margin: 2rem;
+        }
+        label {
+            display: block;
+            margin-top: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        input[type=text], input[type=number] {
+            width: 100%;
+            padding: 0.3rem;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        button {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            font-family: monospace;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        #imgCanvas {
+            margin-top: 1rem;
+            border: 1px solid #fff;
+            image-rendering: pixelated;
+        }
+        #frameInfo {
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .controls button {
+            margin: 0 0.25rem;
+        }
     </style>
 </head>
+<body>
+    <h1>Incredibox Animation Renderer (URL Import & Custom Loop)</h1>
 
+    <label for="spriteUrl">Sprite Sheet URL (PNG):</label>
+    <input type="text" id="spriteUrl" placeholder="https://example.com/spritesheet.png" />
 
+    <label for="jsonUrl">Animation JSON URL:</label>
+    <input type="text" id="jsonUrl" placeholder="https://example.com/animation.json" />
 
-<body style="background-color:rgb(17, 5, 29) ;">
-    <div id="overlay" class="text-center visually-hidden">
-        <img width="15%" class="position-absolute top-50 start-50 translate-middle" src="../assets/loading.gif"/>
+    <label for="loopTime">Loop Time (seconds):</label>
+    <input type="number" id="loopTime" min="0.1" step="0.1" value="3" />
+
+    <button id="loadBtn">Load Animation</button>
+
+    <canvas id="imgCanvas" width="164" height="225"></canvas>
+    <div id="frameInfo">Frame: 0 / 0</div>
+
+    <div class="controls" style="text-align:center; margin-top:1rem;">
+        <button id="prevFrame">&lt; Prev Frame</button>
+        <button id="playPause">Play</button>
+        <button id="nextFrame">Next Frame &gt;</button>
     </div>
-    <div class="topnav">
-		<a href="../">Home</a>
-		<a class="active" href="./">Tools</a>
-		<a href="../mods">Mods</a>
-		<a href="../about">About Us</a>
-		<a href="https://sealldeveloper.github.io/incredibox-downloads-index/">Mod Index</a>
-<a href='https://ko-fi.com/K3K3LWCC7' target='_blank'><img height='24' style='border:0px;height:24px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' alt='Buy Me a Coffee at ko-fi.com' /></a>
-	  </div>
-	<div class="container mt-3" style="background-color:rgb(29, 8, 49) ; overflow:hidden;	padding-bottom:40px;height:100%;" >
-        <div id="title" class="m-4">
-            <h1>Incredibox Animation Renderer</h1>
-            <small class="m-2">Made by LeBeaBae & seal</small>
-        </div>
-        <div id="form">
-            <h3 class="m-3">Inputs</h3>
-            <div class="form-group required col-md-5 m-3">
-                <label for="imgInp">Sprite Sheet</label>
-                <input class="form-control" type="file" id="imgInp" accept="image/PNG"></input>
-            </div>
-            <div class="form-group required col-md-5 m-3">
-                <label for="jsonInp">JSON</label>
-                <input class="form-control" type="file" id="jsonInp" accept="application/JSON"></input>
-            </div>
-            <div class="form-group required col-md-5 m-3">
-                <label for="res">Resolution / Sprite Sheet Size</label>
-                <select class="form-control form-select" id="res" name="res">
-                    <option value="1">Non-HD (x1)</option>
-                    <option value="2">HD (x2)</option>
-                </select>
-            </div>
-            <div class="form-group required col-md-5 m-3">
-                <label for="fps">FPS</label>
-                <select class="form-control form-select" id="fps" name="fps">
-                    <option value="125">24 FPS</option>
-                    <option value="100">30 FPS</option>
-                </select>
-            </div>
-            <div class="form-group required col-md-5 m-3">
-                <label for="color">Background Colour</label>
-                <input class="form-control" type="text" data-coloris id="color" value="#000000"></input>
-            </div>
-	    <h3 class="m-3">Optional: <b>(WIP)</b></h3>
-	    <div class="form-group col-md-5 m-3">
-                <label for="aud">Number of audio files:</label>
-                <select class="form-control form-select" id="aud" name="aud">
-                    <option value="1">1 file (one loop)</option>
-		    <option value="1">1 file (two loops)</option>
-                    <option value="2">2 files (two loops)</option>
-                </select>
-            </div>
-	    <div class="form-group col-md-5 m-3">
-                <label for="audInp">Audio</label>
-                <input class="form-control audio-inputs" type="file" id="audInp1" accept="audio/*"></input>
-		        <input class="form-control audio-inputs" type="file" id="audInp2" accept="audio/*" style="display:none;"></input>
-            </div>
-            <div class="form-group col-md-5 m-3">
-                <input class="btn btn-primary" type="button" value="Generate GIF" id="gif"></input>
-            </div>
-            <h3 class="m-3">Preview</h3>
-            <div class="form-group col-md-5 m-3">
-                <canvas id="imgCanvas" width="164" height="225" style="border:1px solid black;"></canvas>
-                <br>
-                <img id="image" alt="Preview" style="display:none"/>
-                <small id="imgInfo" class="m-1"></small>
-                <br>
-                <div class="btn-group" role="group" id="frameControls">
-                    <a class="btn coolButton" role="button" id="frameStepBack">&lt; Frame</a>
-                    <a class="btn coolButton" role="button" id="framePlayBack">&lt; Play</a>
-                    <a class="btn coolButton" role="button" id="frameStop">STOP</a>
-                    <a class="btn coolButton" role="button" id="framePlayForward">Play &gt;</a>
-                    <a class="btn coolButton" role="button" id="frameStepForward">Frame &gt;</a>
-                </div>
-            </div>
-		<audio id="audFile1" src="" hidden></audio>
-		<audio id="audFile2" src="" hidden></audio>
-        </div>
-	</div>
-    <script>
-        var image_element = document.getElementById("image");
-        var image_file_width = 0;
-        var image_file_height = 0;
-        var sheet_sprite_count_x;
-        var sheet_sprite_width = 164;
-        var sheet_sprite_height = 380;
-        var frame_index_current = 0;
-        var frame_index_start = 0;
-        var frame_index_count = 1;
-        var fps = Number($("#fps").val());
-        var res = Number($("#res").val());
-        var frame_time_total = fps/3;
-        var frame_time_current = 0;
-        var frame_step = 0;
-        var sheet_spacing_horizontal = sheet_sprite_width * res;
-        var sheet_padding_top = sheet_sprite_height * res;
-        var head_height = 225 * res;
-        var canvas = document.getElementById("imgCanvas");
-        var canvas_context = canvas.getContext("2d");
-        var image_background_color = "#000000";
-        var border_bool = false;
-        var image_src;
-        var json_src;	    
-        var aud_src = [];
-        var aud_len;
-        var current_aud;
-        var ui_framenum = true;
-        var ui_framecontrols = true;
-        var gif_loop = true;
-        var gif_show = true;
-        var anime_name;
-        var arrayFrame = [[0,0,0,0]];
-        var arr;
 
-        function Update() {
-        if (!image.src) return;
-        
-        frame_time_current -= 16;
-        
-        if (frame_time_current <= 0) {
-            frame_time_current += parseInt(frame_time_total);
-            frame_index_current += frame_step;
-            if (frame_index_current >= frame_index_count)
-                frame_index_current = 0;
-            else if (frame_index_current < 0)
-                frame_index_current = frame_index_count - 1;
+<script>
+(() => {
+    const canvas = document.getElementById('imgCanvas');
+    const ctx = canvas.getContext('2d');
 
-            UpdateSprite();
-	        UpdateAudio();
-        }
-        }
+    let spriteImage = new Image();
+    let animationData = null;
+    let frameIndex = 0;
+    let playing = false;
+    let loopTime = 3.0; // seconds
+    let frameCount = 0;
+    let frameTimer = 0;
+    let lastTimestamp = 0;
 
-        function UpdateSprite() {
-        // frame_index_current = 0 based index
-        if (arrayFrame[frame_index_current]) {
-            var spritePosX = arrayFrame[frame_index_current][0] * res || 1;
-            var spritePosY = arrayFrame[frame_index_current][1] * res || 1;
+    // Constants (you can tweak these if your spritesheet uses different sizes)
+    let sheet_sprite_width = 164;
+    let sheet_sprite_height = 380;
+    let head_height = 225;
 
-            // sprite position on sheet in pixels
-            var x = arrayFrame[frame_index_current][2] * res || 1;
-            var y = arrayFrame[frame_index_current][3] * res || 1;
+    // Array of frames (each frame is [column, row, x, y])
+    let framesArray = [];
 
-            $("#imgInfo").text("Frame: "+(frame_index_current + 1)+" / "+(frame_index_count));
+    // Canvas size update
+    function updateCanvasSize() {
+        canvas.width = sheet_sprite_width;
+        canvas.height = sheet_sprite_height;
+    }
 
-            canvas_context.clearRect(0, 0, canvas.width, canvas.height);
-            
-            canvas_context.imageSmoothingEnabled = false;
-            canvas_context.webkitImageSmoothingEnabled = false;
-            canvas_context.mozImageSmoothingEnabled = false;
-            canvas_context.fillStyle = image_background_color;
-            canvas_context.fillRect(0, 0, canvas.width, canvas.height);
-            if ($('#image').attr('src') !== 'undefined') {
-                canvas_context.drawImage(image_element, sheet_spacing_horizontal * res, 0, sheet_sprite_width * res, sheet_sprite_height * res, 0, 0, sheet_sprite_width * res, sheet_sprite_height * res);
-                canvas_context.drawImage(image_element, spritePosX, spritePosY, sheet_sprite_width * res, head_height * res, 0 + x, 0 + y, sheet_sprite_width * res, head_height * res);
-            }
+    // Draw current frame on canvas
+    function drawFrame(index) {
+        if (!spriteImage.complete || !animationData) return;
+        if (!framesArray[index]) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Extract frame info
+        const [column, row, xOffset, yOffset] = framesArray[index];
+
+        // Source position on sprite sheet
+        const sx = column * sheet_sprite_width;
+        const sy = row * sheet_sprite_height;
+
+        // Draw from sprite sheet, then offset on canvas by xOffset,yOffset
+        ctx.drawImage(
+            spriteImage,
+            sx, sy, sheet_sprite_width, sheet_sprite_height,
+            xOffset, yOffset, sheet_sprite_width, head_height
+        );
+
+        document.getElementById('frameInfo').textContent = `Frame: ${index + 1} / ${frameCount}`;
+    }
+
+    // Animation loop using requestAnimationFrame
+    function animationLoop(timestamp) {
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const delta = (timestamp - lastTimestamp) / 1000; // seconds elapsed
+        lastTimestamp = timestamp;
+
+        if (playing && animationData) {
+            frameTimer += delta;
+            // Calculate frame duration based on loopTime and frameCount
+            const frameDuration = loopTime / frameCount;
+            if (frameTimer >= frameDuration) {
+                frameTimer -= frameDuration;
+                frameIndex = (frameIndex + 1) % frameCount;
+                drawFrame(frameIndex);
             }
         }
+        requestAnimationFrame(animationLoop);
+    }
 
-	function UpdateAudio() {
-		current_aud = Math.ceil((frame_index_current*2)/frame_index_count) === 2 ? "audFile2" : "audFile1";
-        (!$("#"+current_aud).attr('src')) ? console.log($("#"+current_aud).attr('src'), current_aud,frame_index_count,frame_index_current) : console.log(current_aud,frame_index_count,frame_index_current)
-        if ($("#"+current_aud).attr('src')) $("#"+current_aud)[0].load()
-        if (aud_len) _("#"+current_aud).currentTime = Math.round((aud_len*frame_index_current)/frame_index_count)
-	}
-
-        function encode64(input) {
-            var output = "", i = 0, l = input.length,
-            key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", 
-            chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-            while (i < l) {
-                chr1 = input.charCodeAt(i++);
-                chr2 = input.charCodeAt(i++);
-                chr3 = input.charCodeAt(i++);
-                enc1 = chr1 >> 2;
-                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-                enc4 = chr3 & 63;
-                if (isNaN(chr2)) enc3 = enc4 = 64;
-                else if (isNaN(chr3)) enc4 = 64;
-                output = output + key.charAt(enc1) + key.charAt(enc2) + key.charAt(enc3) + key.charAt(enc4);
-            }
-            return output;
-        }
-
-
-        function LoadImageFromDisk(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $('#image').attr('src', e.target.result);
-                $('#imgsrc').val(encodeURIComponent(e.target.result));
-                UpdateCanvasSize();
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-        }
-
-        async function LoadAudioFromDisk(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.readAsDataURL(input.files[0]);
-            returnValue = ""
-            reader.onload = function (e) {
-                returnValue = e.target.result
-            };
-            await waitFor(_ => returnValue !== "")
-            return returnValue
-        }
-        }
-
-        function UpdateCanvasSize() {
-        var wMinusPadL = image_file_width;
-        sheet_sprite_count_x = Math.floor(wMinusPadL / (sheet_sprite_width + sheet_spacing_horizontal));
-        sheet_padding_right = wMinusPadL - sheet_sprite_count_x * sheet_sprite_width - (sheet_sprite_count_x - 1) * sheet_spacing_horizontal;
-        if (sheet_padding_right >= sheet_sprite_width + sheet_spacing_horizontal)
-        {
-            sheet_sprite_count_x = sheet_sprite_count_x + 1;
-            sheet_padding_right = sheet_padding_right - sheet_sprite_width - sheet_spacing_horizontal;
-        }
-
-        $("#imgCanvas").attr("width", sheet_sprite_width * res);
-        $("#imgCanvas").attr("height", sheet_sprite_height * res);
-
-        UpdateSprite();
-        }
-
-        function SetFrameStep(step) {
-            frame_step = step;
-        }
-
-        function AssignSettings() {
-            $("#color").val(image_background_color);
-            $("#image").attr("src", decodeURIComponent(image_src));
-            $("#frameStart").val(frame_index_start + 1); // 0 based index (logic) to 1 based index (UI)
-            UpdateCanvasSize();
-            UpdateSprite();
-        }
-
-        function GenerateGif() {
-            var encoder = new GIFEncoder();
-                encoder.setRepeat(0);
-                encoder.setDelay(frame_time_total);
-                encoder.setQuality(10);
-            
-            var curframe = frame_index_current;
-            encoder.start();
-            for (var i = 0; i < frame_index_count; i++)
-            {
-                frame_index_current = i;
-                UpdateSprite();
-                encoder.addFrame(canvas_context, false);
-            }
-            encoder.finish();
-            frame_index_current = curframe;
-            UpdateSprite();
-
-            var binary_gif = encoder.stream().getData();
-	    var data_url = 'data:image/gif;base64,'+encode64(binary_gif);
-            window.open(data_url)
-            //encoder.download("download.gif");
-        }
-
-        // register event functions
-        image_file_width = this.naturalWidth;
-        image_file_height = this.naturalHeight;
-        UpdateCanvasSize();
-        
-        $("#imgInp").change(function() {
-        	LoadImageFromDisk(this);
-		imgName = this.files.item(0).name;
-		splitName = imgName.split("-");
-		res = splitName[splitName.length-1] === "hd.png" ? 2 : 1;
-		$("res").val(res);
+    // Load sprite sheet image by URL
+    function loadSprite(url) {
+        return new Promise((resolve, reject) => {
+            spriteImage = new Image();
+            spriteImage.crossOrigin = "anonymous"; // Allow cross origin if CORS enabled
+            spriteImage.onload = () => resolve();
+            spriteImage.onerror = () => reject(new Error('Failed to load sprite sheet image.'));
+            spriteImage.src = url;
         });
-        
-        $("#jsonInp").change(function() {
-        LoadJSONFromDisk(this, (text) => {
-            jsonInp = JSON.parse(text);
-            frame_index_count = jsonInp.totalFrame;
-            sheet_sprite_width = jsonInp.width;
-            sheet_sprite_height = jsonInp.height;
-            head_height = jsonInp.headHeight;
-            arr = jsonInp.arrayFrame;
-	    aud_len = Math.ceil((frame_index_count/2)/(fps === 125 ? 0.024 : 0.030));
-            anime_name = jsonInp.animeName;
-            
-            for (len = arr.length, i = 0; i < len; i++) {
-                var temp = arr[i].prop.split(",");
-                arrayFrame.push([Number(temp[0]), Number(temp[1]), Number(temp[2]), Number(temp[3])]);
-            }
-        });
-        });
-        
-        $("#res").change(function() {
-            res = Number($(this).val());
-            UpdateCanvasSize()
-        });
-        
-        $("#fps").change(function() {
-            fps = Number($(this).val());
-            frame_time_total = fps/3
-        });
+    }
 
-	$("#aud").change(function() {
-            aud = Number($(this).val());
-            $("#audInp2").attr("style", "display:"+(aud === 2 ? "block" : "none"));
-        });
+    // Load JSON animation data by URL
+    async function loadJSON(url) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to load JSON data: ${response.statusText}`);
+        return response.json();
+    }
 
-	$(".audio-inputs").change(async function() {
-        console.log(this)
-		aud_src = (aud === 2 ? [$("#audInp1"), $("#audInp2")] : [$("#audInp1"), $("#audInp1")]) || [];
-        aud_names = (aud_src[0] === aud_src[1] ? ["#audFile1", "#audFile1"] : ["#audFile1", "#audFile2"]);
-        for (i=0; i<1; i++) {
-            name = aud_names[i];
-            console.log(name, aud_src[i])
-            prevSrc = $(name).attr('src')
-            audio = await LoadAudioFromDisk(aud_src[i][0])
-            $(name).attr('src',audio);    
+    // Initialize animation data from JSON
+    function initAnimationData(data) {
+        animationData = data;
+
+        if (!animationData.arrayFrame || !animationData.totalFrame || !animationData.width || !animationData.height || !animationData.headHeight) {
+            throw new Error('JSON missing required properties: arrayFrame, totalFrame, width, height, headHeight');
         }
-	      
-		UpdateAudio();
-	});
-        
-        $("#color").change(function() {
-        image_background_color = $("#color").val();
-        UpdateSprite();
-        });
-        
-        $("#frameStepForward").click(function() {
-        frame_index_current += 1;
-        if (frame_index_current >= frame_index_count)
-            frame_index_current = 0;
-        UpdateSprite();
-        });
-	    
-        $("#frameStepBack").click(function() {
-            frame_index_current -= 1;
-            if (frame_index_current < 0)
-                frame_index_current = frame_index_count - 1;
-            UpdateSprite();
-        });
-        
-	$("#frameStop").click(function() { 
-	    SetFrameStep(0); 
-        if (!$("#"+current_aud)[0].paused) $("#"+current_aud)[0].pause();
-	});
 
-	$("#frameStop").dblclick(function() {
-   	   SetFrameStep(0);
-   	   frame_index_current = 0;
-   	 });
-        
-	$("#framePlayForward").click(function() { 
-	    SetFrameStep(1);
-        UpdateAudio();
-        if ($("#"+current_aud)[0].paused) $("#"+current_aud)[0].play().catch((e)=>{console.log(e)})
+        framesArray = animationData.arrayFrame;
+        frameCount = animationData.totalFrame;
+        sheet_sprite_width = animationData.width;
+        sheet_sprite_height = animationData.height;
+        head_height = animationData.headHeight;
 
-	});
-        
-	$("#framePlayBack").click(function() { 
-	    SetFrameStep(-1);  
-	});
-        
-        $("#gif").click(function(){
-            overlay('show');
-            GenerateGif();
-            overlay('hide');
-        });
-    
-        // get default variable values from form inputs
-        image_background_color = $("#color").val();
-        frame_time_total = parseInt($("#fps").val())/3;
-        frame_index_start = parseInt($("#frameStart").val()) - 1; // 1 based index (UI) to 0 based index (logic)
-        sheet_spacing_horizontal = sheet_sprite_width * res;
-        sheet_padding_top = sheet_sprite_height * res;
-        
-        // apply any settings
-        AssignSettings();
-        $('#imgInp').val('');
-        $('#jsonInp').val('');
-        $('#audInp1').val('');
-        $('#audInp2').val('');
-        Coloris({
-            alpha:false
-        })
-        setInterval(Update,16);
-    </script>
-    <h3 style="padding-bottom:5px"></h3>
-    <h3 style="text-align:center;font-size:10px">Made by a <a style="font-size:10px"target="_blank" rel="noopener noreferrer" class="enter">seal</a> and bae ;&rpar;</h3>
+        updateCanvasSize();
+        frameIndex = 0;
+        drawFrame(frameIndex);
+    }
+
+    // Controls
+    document.getElementById('loadBtn').addEventListener('click', async () => {
+        const spriteUrl = document.getElementById('spriteUrl').value.trim();
+        const jsonUrl = document.getElementById('jsonUrl').value.trim();
+        loopTime = parseFloat(document.getElementById('loopTime').value);
+
+        if (!spriteUrl || !jsonUrl) {
+            alert('Please enter both Sprite Sheet URL and JSON URL.');
+            return;
+        }
+        if (isNaN(loopTime) || loopTime <= 0) {
+            alert('Please enter a valid positive number for Loop Time.');
+            return;
+        }
+
+        try {
+            playing = false;
+            frameTimer = 0;
+            lastTimestamp = 0;
+
+            await loadSprite(spriteUrl);
+            const jsonData = await loadJSON(jsonUrl);
+            initAnimationData(jsonData);
+
+            document.getElementById('playPause').textContent = 'Play';
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    document.getElementById('playPause').addEventListener('click', () => {
+        if (!animationData) return;
+
+        playing = !playing;
+        document.getElementById('playPause').textContent = playing ? 'Pause' : 'Play';
+    });
+
+    document.getElementById('prevFrame').addEventListener('click', () => {
+        if (!animationData) return;
+        playing = false;
+        document.getElementById('playPause').textContent = 'Play';
+        frameIndex = (frameIndex - 1 + frameCount) % frameCount;
+        drawFrame(frameIndex);
+    });
+
+    document.getElementById('nextFrame').addEventListener('click', () => {
+        if (!animationData) return;
+        playing = false;
+        document.getElementById('playPause').textContent = 'Play';
+        frameIndex = (frameIndex + 1) % frameCount;
+        drawFrame(frameIndex);
+    });
+
+    // Start animation loop
+    requestAnimationFrame(animationLoop);
+
+})();
+</script>
 </body>
 </html>
